@@ -7,19 +7,44 @@ google music uploader plugin: watch a directory and automatically add songs to g
 bbaldino@gmail.com
 -->
 
+<!-- wait for network to be up -->
+<FILE Name="/tmp/plugin-prepare" Run="/bin/bash">
+    <INLINE>
+        # Wait until network is ready
+        timer=30
+        while [ $timer -gt 0 ]; do
+        gateway=$(route -n | awk '/^0.0.0.0/ {print $2}')
+        if [ -n "$gateway" ] &amp;&amp; [ $(ping -q -n -c 1 $gateway | awk -F, '/received/ {print $2}' | awk '{print $1}') -eq 1 ]; then
+        break
+        fi
+        timer=$((timer-1))
+        sleep 1
+        done
+        if [ $timer -eq 0 ]; then
+        echo "No network communication !!!"
+        fi
+        # Remove this script
+        rm -f /tmp/plugin-prepare
+    </INLINE>
+</FILE>
+
 <!-- pre-req packages -->
 
 <!-- need python -->
 <FILE Name="/boot/packages/python-2.6.6-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/d/python-2.6.6-i486-1.txz</URL>
-<MD5>b8de0c9f8b89aa7b3c89823d20076867</MD5>
+    <URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/d/python-2.6.6-i486-1.txz</URL>
+    <MD5>b8de0c9f8b89aa7b3c89823d20076867</MD5>
 </FILE>
 
 <!-- gmusic api needs protobuf -->
 <FILE Name="/boot/packages/protobuf-2.4.1-i486-1sl.txz" Run="upgradepkg --install-new">
-<URL>http://repository.slacky.eu/slackware-13.37/libraries/protobuf/2.4.1/protobuf-2.4.1-i486-1sl.txz</URL>
+    <URL>http://repository.slacky.eu/slackware-13.37/libraries/protobuf/2.4.1/protobuf-2.4.1-i486-1sl.txz</URL>
+</FILE>
 
 
 <!-- plugin -->
 <FILE Name="/boot/config/plugins/google-music-uploader/google-music-uploader.tgz">
-<URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
+    <URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
+</FILE>
+
+</PLUGIN>
