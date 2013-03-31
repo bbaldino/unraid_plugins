@@ -1,0 +1,25 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+google music uploader plugin: watch a directory and automatically add songs to google music
+
+bbaldino@gmail.com
+-->
+
+<!-- pre-req packages -->
+
+<!-- need python -->
+<FILE Name="/boot/packages/python-2.6.6-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/d/python-2.6.6-i486-1.txz</URL>
+<MD5>b8de0c9f8b89aa7b3c89823d20076867</MD5>
+</FILE>
+
+<!-- gmusic api needs protobuf -->
+<FILE Name="/boot/packages/protobuf-2.4.1-i486-1sl.txz" Run="upgradepkg --install-new">
+<URL>http://repository.slacky.eu/slackware-13.37/libraries/protobuf/2.4.1/protobuf-2.4.1-i486-1sl.txz</URL>
+
+
+<!-- plugin -->
+<FILE Name="/boot/config/plugins/google-music-uploader/google-music-uploader.tgz">
+<URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
