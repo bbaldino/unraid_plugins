@@ -1,0 +1,128 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+A test plugin to automatically install VIM and set up a vimrc file
+-->
+
+<FILE Name="/boot/packages/vim-7.3.154-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/ap/vim-7.3.154-i486-1.txz</URL>
+</FILE>
+
+<FILE Name="/root/.vimrc">
+    <INLINE>
+        <![CDATA[
+            "USEFUL COMMANDS (NO CONFIG NEEDED):
+            " :sp (filename) - loads filename in new split window. if no filename is
+            "                  specified, the current file is loaded
+            "   Split window manipulation:
+            "   <CTL-W>+
+            "           k - move up one split
+            "           j - move down one split
+            "           + - make this window bigger
+            "           - - make this window smaller
+            "   :(w)q - (write and) close this split
+            " :TOhtml - creates HTML file from current file using syntax coloring
+            "
+            " HOW TO USE THE HELP FILES
+            " The help files are a great resource, but they're a bit confusing to learn
+            " For help on a topic, type :help
+            " Links look like |this| - if you cursor over them and type <CTL+]>, you'll
+            " jump to that section of help. To get back to where you were, type <CTL+0>
+
+            syntax on
+
+            colorscheme murphy
+            set nocompatible        " Use Vim defaults (much better!)
+            set bs=2                " Allow backspacing over everything in insert mode
+            set ai                  " Always set auto-indenting on
+            "set backup             " Keep a backup file
+            set viminfo='20,\"50    " read/write a .viminfo file -- limit to only 50
+            set history=50          " keep 50 lines of command history
+            set ruler               " Show the cursor position all the time
+            set ts=4                " 4 space wide tabs
+            set sw=4
+            set softtabstop=4       "makes backspacing over spaced out tabs work real nice
+            set expandtab           "expand tabs to spaces
+            set ignorecase
+            set smartcase           "Only do a case sensitive search if the search term has an upper case
+            set background=dark     "awesome for terminals with crappy colors (putty!)
+            set tagstack            "lets you push and pop your jumps with ctrl+]
+            set pastetoggle=<F9>    "when you're pasting stuff this keeps it from getting
+                        "all whacked out with indentation
+            set incsearch
+            set nohlsearch
+            set autoindent
+            set smartindent
+            set formatoptions=tcqor
+            set scrolloff=10
+            set wildmode=list:longest
+            set listchars=tab:>-,eol:$
+
+            " Indentiation for python files
+            autocmd BufRead *.py set smartindent cinwords=if,elif,else,for,while,try,except,finally,def,class
+
+            nnoremap <Ins> <C-Y>
+            nnoremap <Del> <C-E>
+            nnoremap <CR> <j>
+            nnoremap <Return> <j>
+
+            "dictionary word autocomplete. type <CTL-N> in the middle of a word to use
+            set dictionary-=/usr/share/dict/words dictionary+=/usr/share/dict/words
+            set complete-=k complete+=k
+
+            " Don't use Ex mode, use Q for formatting
+            map Q gq
+
+            "collapsing window splits
+            map <C-J> <C-W>j<C-W>_
+            map <C-K> <C-W>k<C-W>_
+
+            " remove ^M characters from windows files
+            map <C-M> mvggVG:s/<C-V><CR>//g<CR>`v
+
+            "rot13 dmca-grade encryption
+            "this is useful to obfuscate whatever it is that you're working on temporarily
+            "if someone walks by (vim pr0n?)
+            map <F3> mzggVGg?`z
+
+            "don't expand tabs if we're in a makefile
+            au BufRead,BufNewFile Makefile set ts=4 sw=4 noexpandtab
+
+            "autocmd BufNewFile,BufRead *.txt set tw=78
+            "autocmd BufNewFile,BufRead *.tex set tw=80
+
+            "good tab completion - press <tab> to autocomplete if there's a character
+            "previously
+            function InsertTabWrapper()
+                  let col = col('.') - 1
+                  if !col || getline('.')[col - 1] !~ '\k'
+                  return "\<tab>"
+                  else
+                  return "\<c-p>"
+                  endif
+            endfunction
+
+            inoremap <tab> <c-r>=InsertTabWrapper()<cr>
+
+            "Following commands automatically match parens/brackets/braces
+            "inoremap ( ()<Left>
+            "inoremap [ []<Left>
+            "inoremap { {}<Left>
+
+            nnoremap <silent> <C-F> :execute 'grep! -Irni ' . expand("<cword>") . ' *' <CR>:cw<CR>
+
+            au BufReadPost quickfix nnoremap <CR> <C-W><CR>
+
+            "Automatically jump to the last line you were at (`" command does this)
+            autocmd BufReadPost *  exe "normal `\""
+
+            map <F4> :NERDTreeToggle<cr>
+            map <F5> :ConqueTermTab bash<cr>
+
+            set noswapfile
+        ]]>
+    </INLINE>
+</FILE>
+
+</PLUGIN>
