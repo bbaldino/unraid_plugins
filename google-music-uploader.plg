@@ -41,6 +41,10 @@ bbaldino@gmail.com
     <URL>http://repository.slacky.eu/slackware-13.37/libraries/protobuf/2.4.1/protobuf-2.4.1-i486-1sl.txz</URL>
 </FILE>
 
+<!-- icon file -->
+<FILE Name="/boot/config/plugins/google-music-uploader/gmu.png">
+<URL>https://github.com/bbaldino/gmusic_uploader/blob/master/gmu.png</URL>
+</FILE>
 
 <!-- plugin -->
 <FILE Name="/boot/config/plugins/google-music-uploader/google-music-uploader.tgz">
