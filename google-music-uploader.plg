@@ -7,7 +7,10 @@ google music uploader plugin: watch a directory and automatically add songs to g
 bbaldino@gmail.com
 -->
 
-<!-- wait for network to be up -->
+<!-- 
+wait for network to be up 
+(stolen from the simpleFeatures plugin)
+-->
 <FILE Name="/tmp/plugin-prepare" Run="/bin/bash">
     <INLINE>
         # Wait until network is ready
@@ -45,6 +48,37 @@ bbaldino@gmail.com
 <!-- plugin -->
 <FILE Name="/boot/config/plugins/google-music-uploader/google-music-uploader.tgz">
     <URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/disks_mounted" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/usr/bin/python /usr/local/google-music-uplaoder/gmusic_uploader/google_music_uploader.py
+]]>
+</INLINE>
+</FILE>
+
+<!-- plugin install script -->
+<FILE Name="/tmp/google-music-uploader-install" Run="/usr/bin/python">
+<INLINE>
+<![CDATA[
+import os, subprocess
+install_dir = "/usr/local/google-music-uploader"
+os.makedirs(install_dir)
+os.chdir(install_dir)
+subprocess.call(["tar", "-xf", "/boot/config/plugins/google-music-uploader/google-music-uploader.tgz"])
+subprocess.call(["mv", "gmusic_uploader-master", "gmusic_uploader"])
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/var/log/plugins/google-music-uploader">
+<INLINE>
+<![CDATA[
+Google Music Uploader is a music file uploader client for google music based on inotify
+]]>
+</INLINE>
 </FILE>
 
 </PLUGIN>
