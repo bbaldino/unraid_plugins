@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<PLUGIN>
+
+<!--
+A test plugin to automatically install git
+-->
+
+<FILE Name="/boot/packages/git-1.7.4.4-i486-1.txz" Run="upgradepkg --install-new">
+<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/d/git-1.7.4.4-i486-1.txz</URL>
+</FILE>
+
+<FILE Name="/tmp/git-config" Run="/bin/bash">
+<INLINE>
+<![CDATA[
+git config --global user.name "Brian Baldino"
+git config --global user.email bbaldino@gmail.com
+]]>
+</INLINE>
+</FILE>
+
+
+</PLUGIN>
