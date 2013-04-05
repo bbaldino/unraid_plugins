@@ -87,7 +87,7 @@ Type="php"
 <INLINE>
 <![CDATA[
 #!/bin/bash
-/usr/bin/python /usr/local/google-music-uplaoder/gmusic_uploader/google_music_uploader.py
+/usr/bin/python /usr/local/google-music-uploader/gmusic_uploader/google_music_uploader.py
 ]]>
 </INLINE>
 </FILE>
