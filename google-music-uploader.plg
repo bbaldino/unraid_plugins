@@ -46,7 +46,36 @@ wait for network to be up
 
 <!-- icon file -->
 <FILE Name="/boot/config/plugins/google-music-uploader/gmu.png">
-<URL>https://github.com/bbaldino/gmusic_uploader/blob/master/gmu.png</URL>
+<URL>--no-check-certificate https://raw.github.com/bbaldino/gmusic_uploader/master/gmu.png</URL>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.png">
+<LOCAL>/boot/config/plugins/google-music-uploader/gmu.png</LOCAL>
+</FILE>
+
+<!-- page info -->
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.page">
+<INLINE>
+<![CDATA[
+Menu="NetworkServices"
+Icon="gmu.png"
+Version=".1"
+Author="bbaldino"
+Type="php"
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.php">
+<INLINE>
+<![CDATA[
+<html>
+    <body>
+        Welcome to google music uploader config
+    </body>
+</html>
+]]>
+</INLINE>
 </FILE>
 
 <!-- plugin -->
