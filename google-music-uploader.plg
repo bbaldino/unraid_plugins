@@ -59,7 +59,7 @@ wait for network to be up
 <![CDATA[
 #!/usr/bin/python
 # Start/stop/restart google music uploader
-import os, subprocess, time
+import os, subprocess, time, sys
 
 def is_running():
     s = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
