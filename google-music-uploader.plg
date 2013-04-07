@@ -95,6 +95,9 @@ def get_pid_from_pidfile():
     with open("/var/run/google_music_uploader/gmu.pid", "r") as f:
         return f.read()
 
+def remove_pidfile():
+    os.remove("/var/run/google_music_uploader/gmu.pid")
+
 def read_config():
     global config
     with open("/boot/config/plugins/google-music-uploader/gmu_config.cfg", "r") as f:
@@ -126,7 +129,12 @@ def gmu_stop():
         return
     pid = get_pid_from_pidfile()
     subprocess.Popen(["kill", pid])
-    print "Stopped google music uploader"
+    time.sleep(1)
+    if is_running():
+        print "Error stopping google music uploader"
+    else:
+        print "Stopped google music uploader"
+        remove_pidfile()
 
 def gmu_restart():
     gmu_stop()
@@ -244,11 +252,20 @@ checkINSTALLDIR(document.gmu_settings);
 </FILE>
 
 <!-- event handler -->
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/array_started" Mode="0770">
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/disks_mounted" Mode="0770">
 <INLINE>
 <![CDATA[
 #!/bin/bash
 /etc/rc.d/rc.gmu start
+]]>
+</INLINE>
+</FILE>
+
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/unmounting_disks" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/bin/bash
+/etc/rc.d/rc.gmu stop
 ]]>
 </INLINE>
 </FILE>
