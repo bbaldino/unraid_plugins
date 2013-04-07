@@ -70,7 +70,7 @@ def is_running():
 
 def get_pid_from_pidfile():
     with open("/var/run/google_music_uploader/gmu.pid", "r") as f:
-        return int(f.read())
+        return f.read()
 
 def gmu_start():
     print "Starting google music uploader"
