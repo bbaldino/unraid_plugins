@@ -53,6 +53,66 @@ wait for network to be up
 <LOCAL>/boot/config/plugins/google-music-uploader/gmu.png</LOCAL>
 </FILE>
 
+<!-- rc.d script -->
+<FILE Name="/etc/rc.d/rc.gmu" Mode="0770">
+<INLINE>
+<![CDATA[
+#!/usr/bin/python
+# Start/stop/restart google music uploader
+import os, subprocess, time
+
+def is_running():
+    s = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
+    for line in s.stdout:
+        if "google_music_uploader.py" in line:
+            return True
+    return False
+
+def get_pid_from_pidfile():
+    with open("/var/run/google_music_uploader/gmu.pid", "r") as f:
+        return int(f.read())
+
+def gmu_start():
+    print "Starting google music uploader"
+    # no-op if already running
+    if is_running():
+        print "Already running"
+        return
+
+    subprocess.Popen(["/usr/bin/python", "/usr/local/google-music-uploader/gmusic_uploader/google_music_uploader.py", "--pidfile", "&"])
+    print "Started google music uploader"
+
+def gmu_stop():
+    print "Stopping google music uploader"
+    if not is_running():
+        print "Wasn't running"
+        return
+    pid = get_pid_from_pidfile()
+    subprocess.Popen(["kill", pid])
+    print "Stopped google music uploader"
+
+def gmu_restart():
+    gmu_stop()
+    time.sleep(1)
+    gmu_start()
+
+
+def main():
+    if "start" in sys.argv:
+        gmu_start()
+    elif "stop" in sys.argv:
+        gmu_stop()
+    elif "restart" in sys.argv:
+        gmu_restart()
+    else:
+        print "Usage: %s [start|stop|restart]" % sys.argv[0]
+
+if __name__ == "__main__":
+    main()
+]]>
+</INLINE>
+</FILE>
+
 <!-- page info -->
 <FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.page">
 <INLINE>
@@ -83,11 +143,11 @@ Type="php"
     <URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/disks_mounted" Mode="0770">
+<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/array_started" Mode="0770">
 <INLINE>
 <![CDATA[
 #!/bin/bash
-/usr/bin/python /usr/local/google-music-uploader/gmusic_uploader/google_music_uploader.py
+/etc/rc.d/rc.gmu start
 ]]>
 </INLINE>
 </FILE>
