@@ -1,8 +1,23 @@
 <?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+<!ENTITY plugin_name "bgmm">
+<!ENTITY install_dir "/boot/config/plugins/&plugin_name;">
+<!ENTITY gui "/usr/local/emhttp/plugins">
+<!ENTITY config_file_name "&plugin_name;_config.cfg">
+<!ENTITY pid_file_path "/var/run/&plugin_name;/&plugin_name;.pid">
+
+<!ENTITY pkg "/boot/packages">
+<!ENTITY plg "/boot/plugins/bgmm">
+<!ENTITY rom "/boot/config/simpleFeatures">
+<!ENTITY ram "/var/local/emhttp">
+<!ENTITY src "http://unraid-simplefeatures.googlecode.com/files">
+<!ENTITY version ".1">
+]>
+
 <PLUGIN>
 
 <!--
-google music uploader plugin: watch a directory and automatically add songs to google music
+google music manager plugin
 
 bbaldino@gmail.com
 -->
@@ -47,18 +62,17 @@ wait for network to be up
 <!-- end pre-req packages -->
 
 <!-- icon file -->
-<FILE Name="/boot/config/plugins/google-music-uploader/gmu.png">
-<URL>--no-check-certificate https://raw.github.com/bbaldino/gmusic_uploader/master/gmu.png</URL>
+<FILE Name="&install_dir;/&plugin_name;.png">
+<URL>--no-check-certificate https://raw.github.com/bbaldino/gmusic_uploader/master/&plugin_name;.png</URL>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.png">
-<LOCAL>/boot/config/plugins/google-music-uploader/gmu.png</LOCAL>
+<FILE Name="&gui;/&plugin_name;/&plugin_name;.png">
+<LOCAL>&install_dir;/&plugin_name;.png</LOCAL>
 </FILE>
 
 <!-- config file -->
-<FILE Name="/tmp/google-music-uploader-config" Run="/usr/bin/python">
+<FILE Name="/tmp/&plugin_name;-config" Run="/usr/bin/python">
 <INLINE>
-<![CDATA[
 import os
 import json
 
@@ -67,19 +81,17 @@ config = {
 }
 
 # Don't override an existing config
-if not os.path.isfile("/boot/config/plugins/google-music-uploader/gmu_config.cfg"):
-    with open("/boot/config/plugins/google-music-uploader/gmu_config.cfg", "w+") as f:
+if not os.path.isfile("&install_dir;/&config_file_name;"):
+    with open("&install_dir;/&config_file_name;", "w+") as f:
         json.dump(config, f)
-]]>
 </INLINE>
 </FILE>
 
 <!-- rc.d script -->
-<FILE Name="/etc/rc.d/rc.gmu" Mode="0770">
+<FILE Name="/etc/rc.d/rc.&plugin_name;" Mode="0770">
 <INLINE>
-<![CDATA[
 #!/usr/bin/python
-# Start/stop/restart google music uploader
+# Start/stop/restart &plugin_name;
 import os, subprocess, time, sys, json
 
 config = {}
@@ -87,28 +99,28 @@ config = {}
 def is_running():
     s = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
     for line in s.stdout:
-        if "google_music_uploader.py" in line:
+        if "&plugin_name;.py" in line:
             return True
     return False
 
 def get_pid_from_pidfile():
-    with open("/var/run/google_music_uploader/gmu.pid", "r") as f:
+    with open("&pid_file_path;", "r") as f:
         return f.read()
 
 def remove_pidfile():
-    os.remove("/var/run/google_music_uploader/gmu.pid")
+    os.remove("&pid_file_path;")
 
 def read_config():
     global config
-    with open("/boot/config/plugins/google-music-uploader/gmu_config.cfg", "r") as f:
+    with open("&install_dir;/&config_file_name;", "r") as f:
         config = json.load(f)
 
 def write_config(config):
-    with open("/boot/config/plugins/google-music-uploader/gmu_config.cfg", "w+") as f:
+    with open("&install_dir;/&config_file_name;", "w+") as f:
         json.dump(config, f)
 
 def gmu_start():
-    print "Starting google music uploader"
+    print "Starting &plugin_name;"
     # no-op if disabled
     read_config()
     if config["SERVICE"] == "disabled":
@@ -119,11 +131,11 @@ def gmu_start():
         print "Already running"
         return
 
-    subprocess.Popen(["/usr/bin/python", "/usr/local/google-music-uploader/gmusic_uploader/google_music_uploader.py", "--pidfile", "&"])
-    print "Started google music uploader"
+    subprocess.Popen(["/usr/bin/python", "&install_dir;/&plugin_name;/&plugin_name;.py", "--pidfile", "&pid_file_path;", "&amp;"])
+    print "Started &plugin_name;"
 
 def gmu_stop():
-    print "Stopping google music uploader"
+    print "Stopping &plugin_name;"
     if not is_running():
         print "Wasn't running"
         return
@@ -131,9 +143,9 @@ def gmu_stop():
     subprocess.Popen(["kill", pid])
     time.sleep(1)
     if is_running():
-        print "Error stopping google music uploader"
+        print "Error stopping &plugin_name;"
     else:
-        print "Stopped google music uploader"
+        print "Stopped &plugin_name;"
         remove_pidfile()
 
 def gmu_restart():
@@ -142,14 +154,14 @@ def gmu_restart():
     gmu_start()
 
 def gmu_enable():
-    print "Enabling google music uploader"
+    print "Enabling &plugin_name;"
     read_config()
     global config
     config["SERVICE"] = "enabled"
     write_config(config)
 
 def gmu_disable():
-    print "Disabling google music uploader"
+    print "Disabling &plugin_name;"
     read_config()
     global config
     config["SERVICE"] = "disabled"
@@ -171,31 +183,28 @@ def main():
 
 if __name__ == "__main__":
     main()
-]]>
 </INLINE>
 </FILE>
 
 <!-- page info -->
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.page">
+<FILE Name="&gui;/&plugin_name;/&plugin_name;.page">
 <INLINE>
-<![CDATA[
 Menu="NetworkServices"
-Icon="gmu.png"
+Icon="&plugin_name;.png"
 Version=".1"
 Author="bbaldino"
 Type="php"
 Title="GMusic Uploader"
-]]>
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/gmu.php">
+<FILE Name="&gui;/&plugin_name;/&plugin_name;.php">
 <INLINE>
 <![CDATA[
 <?PHP
 include("JSON.php");
-$gmu_config = json_decode(file_get_contents('/boot/config/plugins/google-music-uploader/gmu_config.cfg'), False);
-$gmu_running = file_exists( "/var/run/google_music_uploader/gmu.pid") ? "yes" : "no";
+$gmu_config = json_decode(file_get_contents('/boot/config/plugins/bgmm/bgmm_config.cfg'), False);
+$gmu_running = file_exists("/var/run/bgmm/bgmm.pid") ? "yes" : "no";
 ?>
 <!--
    When this form is submitted, emhttp will see a GET request like this:
@@ -210,7 +219,7 @@ $gmu_running = file_exists( "/var/run/google_music_uploader/gmu.pid") ? "yes" : 
    and the user is about to transition it back to enabled.  Simple eh?
 -->
    <form name="gmu_settings" method="POST" action="/update.htm" target="progressFrame">
-      <input type="hidden" name="cmd" value="/etc/rc.d/rc.gmu">
+      <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm">
       <table class="settings">
          <tr>
          <td>Enable google music uploader:</td>
@@ -247,44 +256,38 @@ checkINSTALLDIR(document.gmu_settings);
 </FILE>
 
 <!-- code download -->
-<FILE Name="/boot/config/plugins/google-music-uploader/google-music-uploader.tgz">
+<FILE Name="&install_dir;/google-music-uploader.tgz">
     <URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
 </FILE>
 
 <!-- event handler -->
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/disks_mounted" Mode="0770">
+<FILE Name="&gui;/&plugin_name;/event/disks_mounted" Mode="0770">
 <INLINE>
-<![CDATA[
 #!/bin/bash
-/etc/rc.d/rc.gmu start
-]]>
+/etc/rc.d/rc.&plugin_name; start
 </INLINE>
 </FILE>
 
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/event/unmounting_disks" Mode="0770">
+<FILE Name="&gui;/&plugin_name;/event/unmounting_disks" Mode="0770">
 <INLINE>
-<![CDATA[
 #!/bin/bash
-/etc/rc.d/rc.gmu stop
-]]>
+/etc/rc.d/rc.&plugin_name; stop
 </INLINE>
 </FILE>
 
 <!-- plugin install script -->
-<FILE Name="/tmp/google-music-uploader-install" Run="/usr/bin/python">
+<FILE Name="/tmp/&plugin_name;-install" Run="/usr/bin/python">
 <INLINE>
-<![CDATA[
 import os, subprocess
-install_dir = "/usr/local/google-music-uploader"
-os.makedirs(install_dir)
-os.chdir(install_dir)
-subprocess.call(["tar", "-xf", "/boot/config/plugins/google-music-uploader/google-music-uploader.tgz"])
-subprocess.call(["mv", "gmusic_uploader-master", "gmusic_uploader"])
-]]>
+if not os.path.exists("&install_dir;"):
+    os.makedirs("&install_dir;")
+os.chdir("&install_dir;")
+subprocess.call(["tar", "-xf", "&install_dir;/google-music-uploader.tgz"])
+subprocess.call(["mv", "gmusic_uploader-master", "&plugin_name;"])
 </INLINE>
 </FILE>
 
-<FILE Name="/var/log/plugins/google-music-uploader">
+<FILE Name="/var/log/plugins/&plugin_name;">
 <INLINE>
 <![CDATA[
 Google Music Uploader is a music file uploader client for google music based on inotify
@@ -293,7 +296,7 @@ Google Music Uploader is a music file uploader client for google music based on 
 </FILE>
 
 <!-- Need to manually bring over JSON.php to decode config file -->
-<FILE Name="/usr/local/emhttp/plugins/google-music-uploader/JSON.php">
+<FILE Name="&gui;/&plugin_name;/JSON.php">
 <INLINE>
 <![CDATA[
 <?php
