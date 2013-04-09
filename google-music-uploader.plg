@@ -131,7 +131,8 @@ def gmu_start():
         print "Already running"
         return
 
-    subprocess.Popen(["/usr/bin/python", "&install_dir;/&plugin_name;/&plugin_name;.py", "--pidfile", "&pid_file_path;", "&amp;"])
+    devnull = open('/dev/null', 'w')
+    subprocess.Popen(["sudo", "/usr/bin/python", "&install_dir;/&plugin_name;/&plugin_name;.py", "--pidfile", "&pid_file_path;"], stdin=devnull, stdout=devnull, stderr=devnull)
     print "Started &plugin_name;"
 
 def gmu_stop():
@@ -235,9 +236,30 @@ $gmu_running = file_exists("/var/run/bgmm/bgmm.pid") ? "yes" : "no";
       </table>
    </form>
 <? if ($gmu_running=="yes"): ?>
-     <hr>
-     <p class=ContentTitle>GMusic Uploader is running</p>
+    <hr>
+    <p class=ContentTitle>GMusic Uploader is running</p>
 <? endif; ?>
+<table class="settings">
+    <tr>
+<? if ($gmu_running=="yes"): ?>
+    <form name="bgmm_stop" method="POST" action="/update.htm" target="progressFrame">
+        <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm stop">
+        <td><input type="submit" name="runCmd" value="Stop"></td>
+    </form>
+    <form name="bgmm_restart" method="POST" action="/update.htm" target="progressFrame">
+        <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm restart">
+        <td><input type="submit" name="runCmd" value="Restart"></td>
+    </form>
+    </tr>
+<? else: ?>
+    <form name="bgmm_start" method="POST" action="/update.htm" target="progressFrame">
+        <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm start">
+        <td><input type="submit" name="runCmd" value="Start"></td>
+    </form>
+    </tr>
+<? endif; ?>
+</table>
+    
 
 <script type="text/javascript">
 function checkINSTALLDIR(form)
