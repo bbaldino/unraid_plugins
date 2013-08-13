@@ -59,6 +59,11 @@ wait for network to be up
     <URL>http://repository.slacky.eu/slackware-13.37/libraries/protobuf/2.4.1/protobuf-2.4.1-i486-1sl.txz</URL>
 </FILE>
 
+<!-- sqlite3 -->
+<FILE Name="/boot/packages/sqlite-3.7.5-i486-1.txz" Run="upgradepkg --install-new">
+    <URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/ap/sqlite-3.7.5-i486-1.txz</URL>
+</FILE>
+
 <!-- end pre-req packages -->
 
 <!-- icon file -->
@@ -77,7 +82,8 @@ import os
 import json
 
 config = {
-    'SERVICE' : 'disabled'
+    'SERVICE' : 'disabled',
+    'PORT': 9090
 }
 
 # Don't override an existing config
@@ -204,8 +210,9 @@ Title="GMusic Uploader"
 <![CDATA[
 <?PHP
 include("JSON.php");
-$gmu_config = json_decode(file_get_contents('/boot/config/plugins/bgmm/bgmm_config.cfg'), False);
-$gmu_running = file_exists("/var/run/bgmm/bgmm.pid") ? "yes" : "no";
+$bgmm_config = json_decode(file_get_contents('/boot/config/plugins/bgmm/bgmm_config.cfg'), True);
+$bgmm_running = file_exists("/var/run/bgmm/bgmm.pid") ? "yes" : "no";
+$status = $bgmm_config['SERVICE'] == "enabled" ? "enable" : "disable";
 ?>
 <!--
    When this form is submitted, emhttp will see a GET request like this:
@@ -219,59 +226,61 @@ $gmu_running = file_exists("/var/run/bgmm/bgmm.pid") ? "yes" : "no";
    The bit of javascript just causes the INSTALLDIR box to be edit-able only if slimserver is disabled
    and the user is about to transition it back to enabled.  Simple eh?
 -->
-   <form name="gmu_settings" method="POST" action="/update.htm" target="progressFrame">
+<table class="settings">
+<? if ($bgmm_running=="yes"): ?>
+    <p class=ContentTitle>BGMM is running</p>
+    <table class="settings">
+        <tr>
+            <td>
+                <form name="bgmm_stop" method="POST" action="/update.htm" target="progressFrame">
+                    <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm stop">
+                    <input type="submit" name="runCmd" value="Stop"></td>
+                </form>
+            </td>
+            <td>
+                <form name="bgmm_restart" method="POST" action="/update.htm" target="progressFrame">
+                    <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm restart">
+                    <input type="submit" name="runCmd" value="Restart"></td>
+                </form>
+            </td>
+        </tr>
+    </table>
+<? else: ?>
+    <table class="settings">
+        <tr>
+            <td>
+                <form name="bgmm_start" method="POST" action="/update.htm" target="progressFrame">
+                    <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm start">
+                    <input type="submit" name="runCmd" value="Start"></td>
+                </form>
+            </td>
+        </tr>
+    </table>
+<? endif; ?>
+   <form name="bgmm_settings" method="POST" action="/update.htm" target="progressFrame">
       <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm">
       <table class="settings">
          <tr>
-         <td>Enable google music uploader:</td>
-         <td><select name="arg1" size="1"  onChange="checkINSTALLDIR(this.form);">
-            <?=mk_option($gmu_cfg['SERVICE'], "disable", "No");?>
-            <?=mk_option($gmu_cfg['SERVICE'], "enable", "Yes");?>
-            </select></td>
+            <td>Enable google music uploader:</td>
+            <td><select name="arg1" size="1">
+                <?=mk_option($status, "disable", "No");?>
+                <?=mk_option($status, "enable", "Yes");?>
+                </select>
+            </td>
          </tr>
-         <tr>
-         <td></td>
-         <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</b$
+        <tr>
+            <td>Port: <input type="text" name="arg2" value="<?=$bgmm_config['PORT'];?>"></td>
+        </tr>
+        <tr>        
+            <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</b$
          </tr>
       </table>
    </form>
-<? if ($gmu_running=="yes"): ?>
-    <hr>
-    <p class=ContentTitle>GMusic Uploader is running</p>
-<? endif; ?>
 <table class="settings">
-    <tr>
-<? if ($gmu_running=="yes"): ?>
-    <form name="bgmm_stop" method="POST" action="/update.htm" target="progressFrame">
-        <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm stop">
-        <td><input type="submit" name="runCmd" value="Stop"></td>
-    </form>
-    <form name="bgmm_restart" method="POST" action="/update.htm" target="progressFrame">
-        <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm restart">
-        <td><input type="submit" name="runCmd" value="Restart"></td>
-    </form>
-    </tr>
-<? else: ?>
-    <form name="bgmm_start" method="POST" action="/update.htm" target="progressFrame">
-        <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm start">
-        <td><input type="submit" name="runCmd" value="Start"></td>
-    </form>
-    </tr>
-<? endif; ?>
 </table>
     
 
 <script type="text/javascript">
-function checkINSTALLDIR(form)
-{
-   if ("<?=$gmu_running;?>" == "yes") {
-      form.arg2.disabled = true;
-   }
-   else {
-      form.arg2.disabled = (form.arg1.value == "disable");
-   }
-}
-checkINSTALLDIR(document.gmu_settings);
 </script>
 ]]>
 </INLINE>
