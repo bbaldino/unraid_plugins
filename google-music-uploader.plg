@@ -160,12 +160,14 @@ def gmu_restart():
     time.sleep(1)
     gmu_start()
 
-def gmu_enable():
-    print "Enabling &plugin_name;"
+def gmu_enable(args):
+    print "Enabling &plugin_name; with args", args
     read_config()
     global config
     config["SERVICE"] = "enabled"
+    config["PORT"] = args[0]
     write_config(config)
+    gmu_restart()
 
 def gmu_disable():
     print "Disabling &plugin_name;"
@@ -182,7 +184,7 @@ def main():
     elif "restart" in sys.argv:
         gmu_restart()
     elif "enable" in sys.argv:
-        gmu_enable()
+        gmu_enable(sys.argv[2:])
     elif "disable" in sys.argv:
         gmu_disable()
     else:
