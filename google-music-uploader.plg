@@ -137,8 +137,10 @@ def gmu_start():
         print "Already running"
         return
 
+    env = os.environ.copy()
+    env["LANG"] = "en_US.UTF-8"
     devnull = open('/dev/null', 'w')
-    subprocess.Popen(["sudo", "/usr/bin/python", "&install_dir;/&plugin_name;/&plugin_name;.py", "--pidfile", "&pid_file_path;"], stdin=devnull, stdout=devnull, stderr=devnull)
+    subprocess.Popen(["sudo", "/usr/bin/python", "&install_dir;/&plugin_name;/&plugin_name;.py", "--pidfile", "&pid_file_path;"], stdin=devnull, stdout=devnull, stderr=devnull, env=env)
     print "Started &plugin_name;"
 
 def gmu_stop():
