@@ -10,13 +10,13 @@
 <!ENTITY plg "/boot/plugins/bgmm">
 <!ENTITY rom "/boot/config/simpleFeatures">
 <!ENTITY ram "/var/local/emhttp">
-<!ENTITY src "http://unraid-simplefeatures.googlecode.com/files">
 <!ENTITY version ".1">
 ]>
 
 <PLUGIN>
 
 <!--
+BGMM
 google music manager plugin
 
 bbaldino@gmail.com
@@ -205,7 +205,7 @@ Icon="&plugin_name;.png"
 Version=".1"
 Author="bbaldino"
 Type="php"
-Title="GMusic Uploader"
+Title="BGMM"
 </INLINE>
 </FILE>
 
@@ -265,7 +265,7 @@ $status = $bgmm_config['SERVICE'] == "enabled" ? "enable" : "disable";
       <input type="hidden" name="cmd" value="/etc/rc.d/rc.bgmm">
       <table class="settings">
          <tr>
-            <td>Enable google music uploader:</td>
+            <td>Enable BGMM:</td>
             <td><select name="arg1" size="1">
                 <?=mk_option($status, "disable", "No");?>
                 <?=mk_option($status, "enable", "Yes");?>
@@ -291,7 +291,7 @@ $status = $bgmm_config['SERVICE'] == "enabled" ? "enable" : "disable";
 </FILE>
 
 <!-- code download -->
-<FILE Name="&install_dir;/google-music-uploader.tgz">
+<FILE Name="&install_dir;/bgmm.tgz">
     <URL>--no-check-certificate https://github.com/bbaldino/gmusic_uploader/archive/master.tar.gz</URL>
 </FILE>
 
@@ -317,15 +317,15 @@ import os, subprocess
 if not os.path.exists("&install_dir;"):
     os.makedirs("&install_dir;")
 os.chdir("&install_dir;")
-subprocess.call(["tar", "-xf", "&install_dir;/google-music-uploader.tgz"])
-subprocess.call(["mv", "gmusic_uploader-master", "&plugin_name;"])
+subprocess.call(["tar", "-xf", "&install_dir;/bgmm.tgz"])
+subprocess.call(["mv", "BGMM-master", "&plugin_name;"])
 </INLINE>
 </FILE>
 
 <FILE Name="/var/log/plugins/&plugin_name;">
 <INLINE>
 <![CDATA[
-Google Music Uploader is a music file uploader client for google music based on inotify
+BGMM is a music file uploader client for google music based on inotify
 ]]>
 </INLINE>
 </FILE>
