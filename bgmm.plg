@@ -85,7 +85,8 @@ import json
 
 config = {
     'SERVICE' : 'disabled',
-    'PORT': 9090
+    'PORT': 9090,
+    'INSTALL_LOC': "&install_dir;"
 }
 
 # Don't override an existing config
@@ -102,8 +103,6 @@ if not os.path.isfile("&config_file_path;"):
 # Start/stop/restart &plugin_name;
 import os, subprocess, time, sys, json
 
-config = {}
-
 def is_running():
     s = subprocess.Popen(["ps", "aux"], stdout=subprocess.PIPE)
     for line in s.stdout:
@@ -119,18 +118,18 @@ def remove_pidfile():
     os.remove("&pid_file_path;")
 
 def read_config():
-    global config
     with open("&config_file_path;", "r") as f:
         config = json.load(f)
+    return config
 
 def write_config(config):
     with open("&config_file_path;", "w+") as f:
         json.dump(config, f)
 
 def gmu_start():
-    print "Starting &plugin_name;"
+    print "Starting bgmm"
     # no-op if disabled
-    read_config()
+    config = read_config()
     if config["SERVICE"] == "disabled":
         print "Disabled, not starting"
         return
@@ -139,11 +138,14 @@ def gmu_start():
         print "Already running"
         return
 
+    install_dir = config["INSTALL_LOC"]
+    bgmm_path = os.path.join(install_dir, "bgmm", "bgmm.py")
+
     env = os.environ.copy()
     env["LANG"] = "en_US.UTF-8"
     devnull = open('/dev/null', 'w')
-    subprocess.Popen(["sudo", "/usr/bin/python", "&install_dir;/&plugin_name;/&plugin_name;.py", "--pidfile", "&pid_file_path;"], stdin=devnull, stdout=devnull, stderr=devnull, env=env)
-    print "Started &plugin_name;"
+    subprocess.Popen(["sudo", "/usr/bin/python", bgmm_path, "--pidfile", "/var/run/bgmm/bgmm.pid"], stdin=devnull, stdout=devnull, stderr=devnull, env=env)
+    print "Started bgmm"
 
 def gmu_stop():
     print "Stopping &plugin_name;"
@@ -164,21 +166,37 @@ def gmu_restart():
     time.sleep(1)
     gmu_start()
 
-def gmu_enable(args):
-    print "Enabling &plugin_name; with args", args
-    read_config()
-    global config
-    config["SERVICE"] = "enabled"
+def update_settings(args):
+    config = read_config()
     config["PORT"] = args[0]
+    new_install_loc = args[1]
+    curr_install_loc = config["INSTALL_LOC"]
+    if curr_install_loc != new_install_loc:
+        try:
+            # TODO: shutil.move here gave me encoding issues.
+            env = os.environ.copy()
+            env["LANG"] = "en_US.UTF-8"
+            subprocess.call(["mv", curr_install_loc, new_install_loc], env=env)
+        except Exception as e:
+            print("Error changing install location: %s" % e)
+        else:
+            config["INSTALL_LOC"] = new_install_loc
     write_config(config)
+
+def gmu_enable(args):
+    print "Enabling bgmm with args", args
+    config = read_config()
+    config["SERVICE"] = "enabled"
+    write_config(config)
+    update_settings(args)
     gmu_restart()
 
-def gmu_disable():
-    print "Disabling &plugin_name;"
-    read_config()
-    global config
+def gmu_disable(args):
+    print "Disabling bgmm with args", args
+    config = read_config()
     config["SERVICE"] = "disabled"
     write_config(config)
+    update_settings(args)
 
 def main():
     if "start" in sys.argv:
@@ -190,7 +208,7 @@ def main():
     elif "enable" in sys.argv:
         gmu_enable(sys.argv[2:])
     elif "disable" in sys.argv:
-        gmu_disable()
+        gmu_disable(sys.argv[2:])
     else:
         print "Usage: %s [start|stop|restart|enable|disable]" % sys.argv[0]
 
@@ -277,7 +295,10 @@ $status = $bgmm_config['SERVICE'] == "enabled" ? "enable" : "disable";
         <tr>
             <td>Port: <input type="text" name="arg2" value="<?=$bgmm_config['PORT'];?>"></td>
         </tr>
-        <tr>        
+        <tr>
+            <td>Install location: <input type="text" name="arg3" value="<?=$bgmm_config['INSTALL_LOC'];?>"></td>
+        </tr>
+        <tr> 
             <td><input type="submit" name="runCmd" value="Apply"><button type="button" onClick="done();">Done</b$
          </tr>
       </table>
