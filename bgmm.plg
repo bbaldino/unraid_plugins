@@ -2,8 +2,10 @@
 <!DOCTYPE PLUGIN [
 <!ENTITY plugin_name "bgmm">
 <!ENTITY install_dir "/boot/config/plugins/&plugin_name;">
+<!ENTITY appdata_dir "/boot/config/appdata/&plugin_name;">
 <!ENTITY gui "/usr/local/emhttp/plugins">
 <!ENTITY config_file_name "&plugin_name;_config.cfg">
+<!ENTITY config_file_path "&appdata_dir;/&plugin_name;_config.cfg">
 <!ENTITY pid_file_path "/var/run/&plugin_name;/&plugin_name;.pid">
 
 <!ENTITY pkg "/boot/packages">
@@ -87,8 +89,8 @@ config = {
 }
 
 # Don't override an existing config
-if not os.path.isfile("&install_dir;/&config_file_name;"):
-    with open("&install_dir;/&config_file_name;", "w+") as f:
+if not os.path.isfile("&config_file_path;"):
+    with open("&config_file_path;", "w+") as f:
         json.dump(config, f)
 </INLINE>
 </FILE>
@@ -118,11 +120,11 @@ def remove_pidfile():
 
 def read_config():
     global config
-    with open("&install_dir;/&config_file_name;", "r") as f:
+    with open("&config_file_path;", "r") as f:
         config = json.load(f)
 
 def write_config(config):
-    with open("&install_dir;/&config_file_name;", "w+") as f:
+    with open("&config_file_path;", "w+") as f:
         json.dump(config, f)
 
 def gmu_start():
@@ -214,7 +216,7 @@ Title="BGMM"
 <![CDATA[
 <?PHP
 include("JSON.php");
-$bgmm_config = json_decode(file_get_contents('/boot/config/plugins/bgmm/bgmm_config.cfg'), True);
+$bgmm_config = json_decode(file_get_contents('/boot/config/appdata/bgmm/bgmm_config.cfg'), True);
 $bgmm_running = file_exists("/var/run/bgmm/bgmm.pid") ? "yes" : "no";
 $status = $bgmm_config['SERVICE'] == "enabled" ? "enable" : "disable";
 ?>
