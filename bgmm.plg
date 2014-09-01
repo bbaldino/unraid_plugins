@@ -91,6 +91,9 @@ config = {
 
 # Don't override an existing config
 if not os.path.isfile("&config_file_path;"):
+    # Create the directory if it isn't already there
+    if not os.path.exists("&appdata_dir;"):
+        os.makedirs("&appdata_dir;")
     with open("&config_file_path;", "w+") as f:
         json.dump(config, f)
 </INLINE>
