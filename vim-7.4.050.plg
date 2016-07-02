@@ -5,8 +5,14 @@
 A test plugin to automatically install VIM and set up a vimrc file
 -->
 
-<FILE Name="/boot/packages/vim-7.3.154-i486-1.txz" Run="upgradepkg --install-new">
-<URL>http://slackware.cs.utah.edu/pub/slackware/slackware-13.37/slackware/ap/vim-7.3.154-i486-1.txz</URL>
+<FILE Name="/boot/packages/python-2.7.5-x86_64-1.txz" Run="upgradepkg --install-new">
+    <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/python-2.7.5-x86_64-1.txz</URL>
+</FILE>
+<FILE Name="/boot/packages/perl-5.18.1-x86_64-1.txz" Run="upgradepkg --install-new">
+    <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/d/perl-5.18.1-x86_64-1.txz</URL>
+</FILE>
+<FILE Name="/boot/packages/vim-7.4.050-x86_64-1.txz" Run="upgradepkg --install-new">
+    <URL>http://slackware.cs.utah.edu/pub/slackware/slackware64-14.1/slackware64/ap/vim-7.4.050-x86_64-1.txz</URL>
 </FILE>
 
 <FILE Name="/root/.vimrc">
